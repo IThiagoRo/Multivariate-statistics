@@ -351,16 +351,32 @@ for (var in variables) {
 tablas[["P1"]]
 ```
 
+Se puede observar que el promedio de la Masa corporal **(P1)** es mayor
+para los hombres respecto que el de las mujeres, tambien se observa que los hombres 
+son un poco mas disperso que las mujeres. Que el promedio en la masa corporal de los hombres sea mayor nos da un indicio 
+descriptivo de que dicha variable puede discriminar hombres y mujeres. 
+
 
 ```{r}
 tablas[["P29"]]
 ```
+
+Se puede observar que la longitud promedio de las manos **(P29)** es un poco mayor
+para los hombres respecto que el de las mujeres, ambos géneros tiene un comportamiento
+muestral muy similar.
+
 
 
 ```{r}
 tablas[["P38"]]
 ```
 
+Se puede observar que la estatura promedio **(P38)** es mayor
+para los hombres respecto que el de las mujeres. Que el promedio en las estaturas de los hombres sea mayor nos da un indicio 
+descriptivo de que dicha variable puede discriminar hombres y mujeres. 
+
+
+Ahora, vamos a crear gráficos de caja (boxplot) que nos ayudarán a visualizar de manera más clara los comentarios descriptivos previos.
 
 ```{r}
 p1 <-ggplot(data = data,mapping = aes(y = P1,x = Sexo, fill=Sexo))+
@@ -379,6 +395,14 @@ grid.arrange(p1, p2, p3, nrow = 1)
 ```
 
 
+En los boxplots anteriores, se observa que las cajas de los géneros no se traslapan. 
+Esto indica que existen diferencias muestrales entre los géneros en lo que respecta 
+a la masa corporal, la anchura de las caderas y la estatura.
+
+Procederemos a realizar un grafico de diferencias de medias que nos permitira
+si existe diferencia estadistica entre el sexo y las anterios varirables de interes. 
+
+\subsection{Grafico de diferencias de medias}
 
 ```{r}
 par(mfrow= c(1,3))
@@ -390,7 +414,10 @@ plotmeans(P38~Sexo, main=c("Estatura"), data = data, frame = FALSE, p=0.95,col =
 barwidth=3,barcol="black")
 ```
 
-
+Este gráfico de diferencias de medias nos permite concluir y afirmar que cada 
+variable por separado permitiría discriminar entre Hombres y Mujeres, dado que
+hay diferencias estadísticas significativas. Indicando que los hombres tienen en 
+promedio una mayor masa corporal, una mayor anchura en las caderas y una mayor estatura.
 
 \section{Cuarto Punto}
 **Usando las variables continuas, realice un gráfico de dispersión para identificar posibles relaciones entre sus variables. Explique si lo que se observa gráficamente tiene sentido o es coherente a la luz de sus datos. Corrobore lo observado con el cálculo de la matriz de correlaciones. Comente. Repita el proceso discriminando por SEXO. ¿Hay cambios en las estructuras de Covarianzas para ambos grupos? Comente**
@@ -404,7 +431,7 @@ chart.Correlation(aux, histogram = TRUE, method = "pearson",pch="+")
 
 
 ```{r}
-cor(aux) %>% kable(., caption="Matrix de correlaciones",
+cor(data[, 2:8]) %>% kable(., caption="Matrix de correlaciones",
   format = "latex",booktabs=TRUE) %>%
   kable_styling(latex_options = c("HOLD_position"),
   position = "center",full_width = FALSE)
