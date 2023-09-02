@@ -55,7 +55,7 @@ library(Amelia)
 
 Se incluye el código propuesto por el docente, con la intención de validar la extracción de la muestra
 
-```{r, echo=TRUE}
+```{r}
 library(splitstackshape) 
 uno <- read.table("Data/data.txt", header=T, sep=",")
 
@@ -66,7 +66,7 @@ mue <- aux$SAMP1
 mue
 }
 
-data <- genera(1020479466)
+data <- genera(inserte_cedula)
 ```
 
 \section{Primer Punto}
@@ -219,8 +219,13 @@ hist(aux$P29, col='black', main='Histograma Long-Mano', xlab="L_MAN")
 ```
 
 ```{r}
+par(mfrow=c(1,3), new=T)
 hist(aux$P38, col='black', main='Histograma Estatura', xlab="ESTATURA")
 ```
+
+De los anterios histogramas se puede observar algún tipo de bi-modalidad, esto 
+puede ser debido a que en la base de datos se encuentra la variable genero, 
+la cual puede ser un factor discriminante en las variables. 
 
 \subsection{Boxplots}
 
@@ -234,9 +239,14 @@ boxplot(aux$P27, col='gray', main='Boxplot Long-Pie', xlab="L_PIE")
 boxplot(aux$P29, col='gray', main='Boxplot Long-Mano', xlab="L_MAN")
 ```
 
+De los anteriores box-plots se pueden observar datos atípicos en las variables: **MASA**, **PERIMETRO MUSLO**, 
+**PERIMETRO ABDOMINAL CINTURA** y **ANCHURA DE LAS CADERAS**. 
+
 ```{r}
+par(mfrow=c(1,3), new=T)
 boxplot(aux$P38, col='gray', main='Boxplot Estatura', xlab="ESTATURA")
 ```
+
 
 \subsection{Diagrama de Barras}
 
@@ -255,6 +265,9 @@ ggplot(resum, aes(x = Sexo, y = porcentaje, fill = Sexo)) +
   theme_minimal()
 ```
 
+Del anterior grafico de barras se puede observar que el **63.5%** de las observaciones
+pertenecen al genero **Hombre** y el **36.5%** restante pertenece al genero **Mujer**. 
+
 ```{r}
 resum <- data %>% group_by(CAT_IMC) %>% count()
 resum$porcentaje = resum$n/sum(resum$n) * 100
@@ -270,6 +283,10 @@ ggplot(resum, aes(x = reorder(CAT_IMC, -porcentaje), y = porcentaje, fill = CAT_
   ) +
   theme_minimal()
 ```
+
+Del anterior grafico de barras se puede observar que el **77.5%** de las observaciones
+pertenecen a la categoría de indice de masa corporal **Normal**, el **15%**  pertenece a la categoria **Obeso** y
+el **7.5%** restante pertenecen a la categoría **Delgado**. 
 
 \section{Segundo Punto}
 **Realice el respectivo proceso de imputación para los datos faltantes en su base de datos. Explique cómo realiza dicha imputación, cuál criterio utiliza y muestre un par de ejemplos ilustrativos.**
@@ -516,3 +533,63 @@ cambia para hombre y mujeres.
 
 
 \subsection{Clasificación usando la distancia estadística}
+
+Se anexa el codigo usado para realizar la clasificación de la categorias. 
+
+```{r clas, echo =TRUE, eval=FALSE}
+library(stats)
+
+datos <- data[, 2:8]
+k <- 3
+
+
+predecir_categoria <- function(nueva_observacion) {
+
+  distancias <- mahalanobis(datos, nueva_observacion, cov_matrix)
+  
+  df_distancias <- data.frame(Distancia = distancias, Categoria = data$CAT_IMC)
+  
+  df_distancias <- df_distancias[order(df_distancias$Distancia), ]
+  
+  vecinos_cercanos <- df_distancias[1:k, ]
+  
+  categoria_predicha <- names(sort(table(vecinos_cercanos$Categoria), 
+                                   decreasing = TRUE))[1]
+  
+  return(categoria_predicha)
+}
+
+
+n1 <- c(66.1, 53.9, 73.8, 34.7, 27.6, 20.9, 181.6)
+n2 <- c(55.8, 50.1, 76.9, 39.5, 24.7, 17.3, 154.5)
+n3 <- c(62.8, 54.3, 80.4, 37.5, 23.5, 16.5, 156.6)
+n4 <- c(63.9, 50.6, 75.6, 31.5, 24.9, 18.6, 173.1)
+n5 <- c(50.7, 46.3, 72.7, 30.4, 23.5, 16.7, 159.5)
+
+categoria_predicha1 <- predecir_categoria(n1)
+categoria_predicha1
+
+categoria_predicha2 <- predecir_categoria(n2)
+categoria_predicha2
+
+categoria_predicha3 <- predecir_categoria(n3)
+categoria_predicha3
+
+categoria_predicha4 <- predecir_categoria(n4)
+categoria_predicha4
+
+categoria_predicha5 <- predecir_categoria(n5)
+categoria_predicha5
+```
+
+Las nuevas observaciones se clasifican en:
+
+- Normal
+
+- Normal
+
+- Normal
+
+- Normal
+
+- Delgado
