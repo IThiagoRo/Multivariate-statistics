@@ -274,11 +274,54 @@ ggplot(resum, aes(x = reorder(CAT_IMC, -porcentaje), y = porcentaje, fill = CAT_
 \section{Segundo Punto}
 **Realice el respectivo proceso de imputación para los datos faltantes en su base de datos. Explique cómo realiza dicha imputación, cuál criterio utiliza y muestre un par de ejemplos ilustrativos.**
 
-\subsection{Imputación de datos faltantes}
+\subsection{Grafico de datos faltantes}
+
+Procederemos realizando un gráfico de datos faltantes, el cual nos permitirá determinar el porcentaje de datos ausentes en cada variable.
+
 
 ```{r}
 missmap(data, main = "Visualización de Datos Faltantes", col = c("red", "blue"))
 ```
+
+Se puede observar que el porcentaje de datos faltantes es aproximadamente 0. Esto nos indica que la base de datos no presenta muchos problemas con valores faltantes (missing o NA). Sin embargo, las variables P38, P22 y P7 contienen datos faltantes, los cuales son:
+
+- **P38:** observación 173 y 197.
+
+- **P22:** observación 41 y 194.
+
+- **P7:** observación 71.
+
+\subsection{Imputación de datos faltantes}
+
+Como se observó en el análisis descriptivo previo, el género parece ser un factor discriminante en las variables de estatura (P38), anchura de las caderas (P22) y el perímetro del muslo mayor (P7), indicando medidas promedio mayores o menores dependiendo del genero. Por lo tanto, el criterio de imputación de datos se basara en el promedio de la 
+variable respecto al genero de la observación que cuenta con un dato faltante en alguna 
+de las anterios variables. 
+
+**Dos ejemplos de como se realizo la imputación de los datos para la variable P38**
+
+- Para la observación **173** que tiene un valor faltante en la variable *P38*
+(Estatura) se procede a calcular el promedio para hombres y mujeres
+los cuales son: 169.3024 cm y 155.1319 cm respectivamente. Como la observación **173**
+es una **mujer** el valor a imputar es **155.1319** 
+
+- Para la observación **197** que tiene un valor faltante en la variable *P38*
+(Estatura) se procede a calcular el promedio para hombres y mujeres
+los cuales son: 169.3024 cm y 155.1319 cm respectivamente. Como la observación **197**
+es un **hombre** el valor a imputar es **169.3024** 
+
+
+De esta manera se imputan los datos faltantes en las demás variables. 
+
+Se anexa el código usado en R para hacer la imputación de datos.
+
+```{r, echo = TRUE}
+data <- data %>%
+  group_by(Sexo) %>%
+  mutate(P38 = ifelse(is.na(P38), mean(P38, na.rm = TRUE), P38),
+         P22 = ifelse(is.na(P22), mean(P22, na.rm = TRUE), P22),
+         P7 = ifelse(is.na(P7), mean(P7, na.rm = TRUE), P7))
+```
+
 
 \section{Tercer Punto}
 **Considere las variables P1, P29 y P38. ¿Se puede afirmar que cada variable por separado permitiría discriminar entre Hombres y Mujeres? Elabore los resúmenes numéricos y gráficos que considere pertinentes para responder la pregunta.**
