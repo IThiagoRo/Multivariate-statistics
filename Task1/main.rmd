@@ -30,12 +30,17 @@ library(kableExtra)
 library(data.table)
 library(ggplot2)
 library(gridExtra)
+library(Amelia)
 ```
-
 
 ```{=tex}
 \pagestyle{myheadings}
 \input{DocumentFormat/titlepage}
+\thispagestyle{empty}
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
 ```
 \setcounter{page}{2}
 
@@ -44,11 +49,9 @@ library(gridExtra)
 \textbf{Trabajo 1}
 \end{center}
 ```
-
 **Selección de la muestra de datos**
 
-Se incluye el código propuesto por el docente, con la intención de validar la 
-extracción de la muestra 
+Se incluye el código propuesto por el docente, con la intención de validar la extracción de la muestra
 
 ```{r, echo=TRUE}
 library(splitstackshape) 
@@ -64,30 +67,29 @@ mue
 data <- genera(1020479466)
 ```
 
-**1)** Para todas sus variables realice un análisis exploratorio gráfico e identifique posibles valores atípicos u otro tipo de anomalías. (Para las variables Categóricas diagramas de barras, para las continuas o discretas, use Histogramas y/o Boxplot). Comente brevemente.
+\section{Para todas sus variables realice un análisis exploratorio gráfico e identifique posibles valores atípicos u otro tipo de anomalías. (Para las variables Categóricas diagramas de barras, para las continuas o discretas, use Histogramas y/o Boxplot). Comente brevemente.}
 
-\section{Análisis Descriptivos}
+\subsection{Análisis Descriptivos}
 
 Breve descripción de la base de datos: La base de datos corresponde a las medidas antropométricas de la población laboral colombiana (ACOPLA). Esta base de datos cuenta con 200 observaciones y 9 variables de interés, las cuales son:
 
--**Sexo:** Variable categórica (Hom, Muj)
+\-**Sexo:** Variable categórica (Hom, Muj)
 
--**P1: Masa Corporal** Variable continua (kg)
+\-**P1: Masa Corporal** Variable continua (kg)
 
--**P7: Perímetro muslo mayor** Variable continua (cm)
+\-**P7: Perímetro muslo mayor** Variable continua (cm)
 
--**P16: Perímetro abdominal cintura** Variable continua (cm)
+\-**P16: Perímetro abdominal cintura** Variable continua (cm)
 
--**P22: Anchura de las caderas** Variable continua (cm)
+\-**P22: Anchura de las caderas** Variable continua (cm)
 
--**P27: Longitud promedio de los pies** Variable continua (cm)
+\-**P27: Longitud promedio de los pies** Variable continua (cm)
 
--**P29: Longitud promedio de las manos** Variable continua (cm)
+\-**P29: Longitud promedio de las manos** Variable continua (cm)
 
--**P38: Estatura** Variable continua (cm)
+\-**P38: Estatura** Variable continua (cm)
 
--**CAT_IMC: Categoría del indice de masa corporal** Variable categórica (DELGADO, NORMAL Y OBESO)
-
+\-**CAT_IMC: Categoría del indice de masa corporal** Variable categórica (DELGADO, NORMAL Y OBESO)
 
 \subsection{Resumen Numerico}
 
@@ -146,10 +148,6 @@ kable(especial, caption = "Tabla de resúmenes estadísticos de variables contin
 
 ```
 
-
-
-
-
 ```{r, eval=FALSE}
 p1 <- ggplot(aux, aes(x = aux$P1))+
   geom_histogram() +
@@ -204,7 +202,6 @@ plot_grid(p5, p6, p7,
           ncol = 2, align = "hv", labels = "AUTO")
 ```
 
-
 \subsection{Histogramas}
 
 ```{r}
@@ -216,7 +213,6 @@ hist(aux$P22, col='black', main='Histograma Anchura-Caderas', xlab="ANCHURA DE L
 hist(aux$P27, col='black', main='Histograma Long-Pie', xlab="L_PIE")
 hist(aux$P29, col='black', main='Histograma Long-Mano', xlab="L_MAN")
 ```
-
 
 ```{r}
 hist(aux$P38, col='black', main='Histograma Estatura', xlab="ESTATURA")
@@ -233,7 +229,6 @@ boxplot(aux$P22, col='gray', main='Boxplot Anchura-Caderas', xlab="ANCHURA DE LA
 boxplot(aux$P27, col='gray', main='Boxplot Long-Pie', xlab="L_PIE")
 boxplot(aux$P29, col='gray', main='Boxplot Long-Mano', xlab="L_MAN")
 ```
-
 
 ```{r}
 boxplot(aux$P38, col='gray', main='Boxplot Estatura', xlab="ESTATURA")
@@ -256,8 +251,6 @@ ggplot(resum, aes(x = Sexo, y = porcentaje, fill = Sexo)) +
   theme_minimal()
 ```
 
-
-
 ```{r}
 resum <- data %>% group_by(CAT_IMC) %>% count()
 resum$porcentaje = resum$n/sum(resum$n) * 100
@@ -267,10 +260,62 @@ ggplot(resum, aes(x = CAT_IMC, y = porcentaje, fill = CAT_IMC)) +
   geom_text(aes(label = paste0(round(porcentaje, 1), "%")), 
             position = position_stack(vjust = 0.5), size = 4) +
   labs(
-    x = "Sexo",
+    x = "Categoria de Indice de Masa Corporal",
     y = "Porcentaje"
   ) +
   theme_minimal()
 ```
 
+\section{Realice el respectivo proceso de imputación para los datos faltantes en su base de datos. Explique cómo realiza dicha imputación, cuál criterio utiliza y muestre un par de ejemplos ilustrativos.}
 
+\subsection{Imputación de datos faltantes}
+
+```{r}
+missmap(data, main = "Visualización de Datos Faltantes", col = c("red", "blue"))
+```
+
+\section{Considere las variables P1, P29 y P38. ¿Se puede afirmar que cada variable por separado permitiría discriminar entre Hombres y Mujeres? Elabore los resúmenes numéricos y gráficos que considere pertinentes para responder la pregunta.}
+
+
+
+\section{Usando las variables continuas, realice un gráfico de dispersión para identificar posibles relaciones entre sus variables. Explique si lo que se observa gráficamente tiene sentido o es coherente a la luz de sus datos. Corrobore lo observado con el cálculo de la matriz de correlaciones. Comente. Repita el proceso discriminando por SEXO. ¿Hay cambios en las estructuras de Covarianzas para ambos grupos? Comente}
+
+\subsection{Relaciones entre variables}
+
+```{r}
+library(PerformanceAnalytics)
+chart.Correlation(aux, histogram = TRUE, method = "pearson",pch="+")
+```
+
+
+\section{Elabore una tabla de porcentajes de doble entrada con las variables CATIMC y SEXO. Luego presente la información gráficamente. ¿Se puede afirmar que la distribución porcentual de la variable CATIMC es diferente para hombre y mujeres? Justifique su respuesta.}
+
+\subsection{Distribución porcentual y tabla de contingencia.}
+
+```{r}
+datosf_5<-table(data$CAT_IMC,data$Sexo)
+sinsum<- round(prop.table(datosf_5),2)
+tablaprop <- addmargins(round(prop.table(datosf_5),3))*100
+kable(tablaprop, caption="Tabla de contingencia porcentual de doble entrada.",
+format = "latex",booktabs=TRUE) %>%
+kable_styling(latex_options = c("HOLD_position"),
+position = "center",full_width = FALSE)
+```
+
+
+```{r}
+data %>%
+ggplot(aes(x = Sexo, fill = CAT_IMC)) +
+geom_bar(position = "fill") +
+scale_y_continuous(labels = scales::percent) +
+labs(x = "Sexo", fill = "Categoricas IMC")
+```
+
+
+\section{Se tienen los siguientes datos de 5 personas, de las cuales se desconoce su CATIMC.Usando la distancia estadística, determine a cuál de las tres categorías pertenece cada sujeto. Explique claramente el proceso empleado para clasificar los sujetos. Anexe el código empleado.}
+
+![](Images/Tabla1.jpeg)
+
+
+
+\subsection{Clasificación usando la distancia estadística}
