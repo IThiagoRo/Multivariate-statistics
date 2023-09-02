@@ -490,6 +490,10 @@ kable_styling(latex_options = c("HOLD_position"),
 position = "center",full_width = FALSE)
 ```
 
+En la anterior tabla vemos el comportamiento porcentual de los individuos en base a las variables categóricas
+del problema. Se espera que del 15% de personas con obesidad, el 70% son hombres y el 30% son mujeres,
+del 7.5% de pesonas delgadas, el 66.67% son hombres y el 33.33% son mujeres,
+
 
 ```{r}
 data %>%
@@ -499,6 +503,8 @@ scale_y_continuous(labels = scales::percent) +
 labs(x = "Sexo", fill = "Categoricas IMC")
 ```
 
+Segun el anterior grafico la distribución porcentual de la variable CAT_IMC no
+cambia para hombre y mujeres. 
 
 \section{Sexto Punto}
 
