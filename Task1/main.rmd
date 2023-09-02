@@ -29,6 +29,8 @@ library(knitr)
 library(kableExtra)
 library(data.table)
 library(ggplot2)
+library(gplots)
+library(GGally)
 library(gridExtra)
 library(Amelia)
 ```
@@ -67,7 +69,9 @@ mue
 data <- genera(1020479466)
 ```
 
-\section{Para todas sus variables realice un análisis exploratorio gráfico e identifique posibles valores atípicos u otro tipo de anomalías. (Para las variables Categóricas diagramas de barras, para las continuas o discretas, use Histogramas y/o Boxplot). Comente brevemente.}
+\section{Primer Punto}
+
+**Para todas sus variables realice un análisis exploratorio gráfico e identifique posibles valores atípicos u otro tipo de anomalías. (Para las variables Categóricas diagramas de barras, para las continuas o discretas, use Histogramas y/o Boxplot). Comente brevemente.**
 
 \subsection{Análisis Descriptivos}
 
@@ -255,7 +259,8 @@ ggplot(resum, aes(x = Sexo, y = porcentaje, fill = Sexo)) +
 resum <- data %>% group_by(CAT_IMC) %>% count()
 resum$porcentaje = resum$n/sum(resum$n) * 100
 
-ggplot(resum, aes(x = CAT_IMC, y = porcentaje, fill = CAT_IMC)) +
+
+ggplot(resum, aes(x = reorder(CAT_IMC, -porcentaje), y = porcentaje, fill = CAT_IMC)) +
   geom_bar(stat = "identity") +
   geom_text(aes(label = paste0(round(porcentaje, 1), "%")), 
             position = position_stack(vjust = 0.5), size = 4) +
@@ -266,7 +271,8 @@ ggplot(resum, aes(x = CAT_IMC, y = porcentaje, fill = CAT_IMC)) +
   theme_minimal()
 ```
 
-\section{Realice el respectivo proceso de imputación para los datos faltantes en su base de datos. Explique cómo realiza dicha imputación, cuál criterio utiliza y muestre un par de ejemplos ilustrativos.}
+\section{Segundo Punto}
+**Realice el respectivo proceso de imputación para los datos faltantes en su base de datos. Explique cómo realiza dicha imputación, cuál criterio utiliza y muestre un par de ejemplos ilustrativos.**
 
 \subsection{Imputación de datos faltantes}
 
@@ -274,11 +280,77 @@ ggplot(resum, aes(x = CAT_IMC, y = porcentaje, fill = CAT_IMC)) +
 missmap(data, main = "Visualización de Datos Faltantes", col = c("red", "blue"))
 ```
 
-\section{Considere las variables P1, P29 y P38. ¿Se puede afirmar que cada variable por separado permitiría discriminar entre Hombres y Mujeres? Elabore los resúmenes numéricos y gráficos que considere pertinentes para responder la pregunta.}
+\section{Tercer Punto}
+**Considere las variables P1, P29 y P38. ¿Se puede afirmar que cada variable por separado permitiría discriminar entre Hombres y Mujeres? Elabore los resúmenes numéricos y gráficos que considere pertinentes para responder la pregunta.**
+
+\subsection{Resumen Numerico}
+
+```{r}
+variables <- c("P1", "P29", "P38")
+
+# Crear una lista para almacenar las tablas
+tablas <- list()
+
+for (var in variables) {
+  tabla <- data %>%
+    group_by(Sexo) %>%
+    summarize(
+      Promedio = mean(.data[[var]], na.rm = TRUE),
+      DesviacionEstandar = sd(.data[[var]], na.rm = TRUE),
+      Mediana = median(.data[[var]], na.rm = TRUE)
+    ) %>%
+    kable(., caption = paste("Resumen Numerico para", var)) %>%
+    kable_styling(latex_options = c("HOLD_position"), position = "center", full_width = FALSE) 
+  
+  tablas[[var]] <- tabla
+}
+
+tablas[["P1"]]
+```
+
+
+```{r}
+tablas[["P29"]]
+```
+
+
+```{r}
+tablas[["P38"]]
+```
+
+
+```{r}
+p1 <-ggplot(data = data,mapping = aes(y = P1,x = Sexo, fill=Sexo))+
+  geom_boxplot()+ 
+  labs(title = "Masa Corporal")
+
+p2 <-ggplot(data = data,mapping = aes(y = P29, x = Sexo, fill=Sexo))+
+  geom_boxplot()+
+  labs(title = "Anchura Caderas")
+
+p3 <-ggplot(data = data,mapping = aes(y = P38,x = Sexo,fill=Sexo))+
+  geom_boxplot()+
+  labs(title = "Estatura")
+
+grid.arrange(p1, p2, p3, nrow = 1)
+```
 
 
 
-\section{Usando las variables continuas, realice un gráfico de dispersión para identificar posibles relaciones entre sus variables. Explique si lo que se observa gráficamente tiene sentido o es coherente a la luz de sus datos. Corrobore lo observado con el cálculo de la matriz de correlaciones. Comente. Repita el proceso discriminando por SEXO. ¿Hay cambios en las estructuras de Covarianzas para ambos grupos? Comente}
+```{r}
+par(mfrow= c(1,3))
+plotmeans(P1~Sexo, main=c("Masa Corp"),data = data, frame = FALSE, p=0.95,col = "black",
+barwidth=3,barcol="black")
+plotmeans(P29~Sexo, main=c("Anch Caderas"), data = data, frame = FALSE, p=0.95,col = "black",
+barwidth=3,barcol="black")
+plotmeans(P38~Sexo, main=c("Estatura"), data = data, frame = FALSE, p=0.95,col = "black",
+barwidth=3,barcol="black")
+```
+
+
+
+\section{Cuarto Punto}
+**Usando las variables continuas, realice un gráfico de dispersión para identificar posibles relaciones entre sus variables. Explique si lo que se observa gráficamente tiene sentido o es coherente a la luz de sus datos. Corrobore lo observado con el cálculo de la matriz de correlaciones. Comente. Repita el proceso discriminando por SEXO. ¿Hay cambios en las estructuras de Covarianzas para ambos grupos? Comente**
 
 \subsection{Relaciones entre variables}
 
@@ -288,7 +360,25 @@ chart.Correlation(aux, histogram = TRUE, method = "pearson",pch="+")
 ```
 
 
-\section{Elabore una tabla de porcentajes de doble entrada con las variables CATIMC y SEXO. Luego presente la información gráficamente. ¿Se puede afirmar que la distribución porcentual de la variable CATIMC es diferente para hombre y mujeres? Justifique su respuesta.}
+```{r}
+cor(aux) %>% kable(., caption="Matrix de correlaciones",
+  format = "latex",booktabs=TRUE) %>%
+  kable_styling(latex_options = c("HOLD_position"),
+  position = "center",full_width = FALSE)
+```
+
+
+
+```{r, fig.height=5}
+ggplot2::theme_set(ggplot2::theme_bw())
+ggpairs(data[, 1:8], legend=c(1,1),mapping=aes(colour=Sexo,alpha=0.1))+
+theme(legend.position="bottom")
+```
+
+
+
+\section{Quinto Punto}
+**Elabore una tabla de porcentajes de doble entrada con las variables CAT_IMC y SEXO. Luego presente la información gráficamente. ¿Se puede afirmar que la distribución porcentual de la variable CAT_IMC es diferente para hombre y mujeres? Justifique su respuesta.**
 
 \subsection{Distribución porcentual y tabla de contingencia.}
 
@@ -312,10 +402,13 @@ labs(x = "Sexo", fill = "Categoricas IMC")
 ```
 
 
-\section{Se tienen los siguientes datos de 5 personas, de las cuales se desconoce su CATIMC.Usando la distancia estadística, determine a cuál de las tres categorías pertenece cada sujeto. Explique claramente el proceso empleado para clasificar los sujetos. Anexe el código empleado.}
+\section{Sexto Punto}
+
+**Se tienen los siguientes datos de 5 personas, de las cuales se desconoce su CAT_IMC.** 
 
 ![](Images/Tabla1.jpeg)
 
+**Usando la distancia estadística, determine a cuál de las tres categorías pertenece cada sujeto. Explique claramente el proceso empleado para clasificar los sujetos. Anexe el código empleado.**
 
 
 \subsection{Clasificación usando la distancia estadística}
