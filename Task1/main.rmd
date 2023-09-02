@@ -424,20 +424,44 @@ promedio una mayor masa corporal, una mayor anchura en las caderas y una mayor e
 
 \subsection{Relaciones entre variables}
 
-```{r}
-library(PerformanceAnalytics)
-chart.Correlation(aux, histogram = TRUE, method = "pearson",pch="+")
+Procederemos a realizar un grafico de dispersión para tratar de identificar posibles
+relaciones entre las variables continuas. 
+
+```{r, fig.height=4}
+ggpairs(data[2:8], title="Grafico de dispersion y Matriz de Autocorrelación") 
 ```
 
 
-```{r}
-cor(data[, 2:8]) %>% kable(., caption="Matrix de correlaciones",
-  format = "latex",booktabs=TRUE) %>%
-  kable_styling(latex_options = c("HOLD_position"),
-  position = "center",full_width = FALSE)
-```
+Se invita al lector en fijarse en los diagramas de dispersión los cuales nos indican
+de manera descriptiva algún tipo de relación o tendencia lineal entre las variables. Se
+mencionaran las variables que tiene una forma de tendencia lineal mas notoria, las cuales son:
+
+- P1 y P7
+- P1 y P16
+- P7 y P22
+- P27 y P29
+- P27 y P38
+- P29 y P38
+
+Luego procederemos a mirar la matriz de correlación en el mismo gráfico anterior 
+buscando y mencionando en este trabajo escrito, las relaciones lineal fuerte con un
+coeficiente de autocorrelacion por encima del 80%, las cuales son:
+
+-P27 y P29: con un coeficiente de autocorrelación de 91.6%
+-P27 y P38: con un coeficiente de autocorrelación de 89.4%
+-P38 y P29: con un coeficiente de autocorrelación de 88.6%
+
+A la luz de los datos, las relaciones anteriormente mencionadas tiene demasiado
+sentido. Dado que estas relaciones como:
+
+- La variable P27 longitud promedio de los pies y P29 longitud promedio de las manos.
+- La variable P27 longitud promedio de los pies y P38 la estatura.
+- La variable P38 estatura y P29 longitud promedio de las manos. 
+
+Guardan una estrecha relación antropometricas. 
 
 
+\subsection{Gráfico de analisis general multivariado}
 
 ```{r, fig.height=5}
 ggplot2::theme_set(ggplot2::theme_bw())
@@ -445,6 +469,10 @@ ggpairs(data[, 1:8], legend=c(1,1),mapping=aes(colour=Sexo,alpha=0.1))+
 theme(legend.position="bottom")
 ```
 
+Se puede evidenciar, como era de esperarse, que existen cambios en la estructura 
+de covarianza cuando discriminamos las variables por género. Dado que esta 
+segmentacíon ayuda a explicar mejor las variables como la estatura, la longitud
+promedio de las manos y la longitud promedio de los pies. 
 
 
 \section{Quinto Punto}
