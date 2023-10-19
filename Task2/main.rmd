@@ -1,0 +1,45 @@
+---
+header-evals:
+- \usepackage{longtable}
+- \usepackage[utf8]{inputenc}
+- \usepackage[spanish]{babel}\decimalpoint
+#- \setlength{\parindent}{1.25cm}
+- \usepackage{amsmath}
+output:
+  pdf_document:
+    number_sections: true
+fontsize: 12pt
+papersize: letter
+#geometry: margin = 1in
+language: "es"
+lang: es-ES
+---
+
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE, echo = FALSE,fig.align = "center",
+                      fig.height = 3.2, fig.pos = "H")
+
+```
+
+```{r}
+library(tidyverse)
+library(knitr)
+```
+
+```{=tex}
+\pagestyle{myheadings}
+\input{DocumentFormat/titlepage}
+\thispagestyle{empty}
+\tableofcontents
+\listoffigures
+\listoftables
+\newpage
+```
+\setcounter{page}{2}
+
+```{=tex}
+\begin{center}
+\textbf{Trabajo 2}
+\end{center}
+```
