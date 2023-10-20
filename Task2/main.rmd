@@ -17,7 +17,7 @@ lang: es-ES
 
 ```{r setup, echo=FALSE}
 knitr::opts_chunk$set(warning = FALSE,
-                      message = FALSE, echo = FALSE,fig.align = "center",
+                      message = FALSE, echo = TRUE,fig.align = "center",
                       fig.height = 3.2, fig.pos = "H")
 
 ```
@@ -69,7 +69,7 @@ x <- datos %>% select(P1, P7, P16, P22, P25, P27, P29, P38)
 
 ![](Images/Q1.jpeg)
 
-Primero procederemos a verificar si el vector de variables se distribuye normal por medio de la prueba estadística Shapiro-Wilk de normalidad multivariada. 
+Primero procederemos a verificar si el vector de variables se distribuye normal por medio de la prueba estadística Shapiro-Wilk de normalidad multivariada.
 
 ```{r}
 
@@ -78,20 +78,17 @@ mu_0 <- c(66.1, 58, 81.6, 37, 47, 25, 19.2, 167)
 mshapiro.test(t(as.matrix(x)))
 ```
 
-Observando un $Valor P = 4.09\times10^{-8}$, podemos rechazar la hipótesis nula con un nivel de 
-significancia de $\alpha = 0.05$ lo que nos permite concluir que $X$ no cumple normalidad multivariada.
-Basado en el **Teorema del limite central** sabemos que si se tiene: 
+Observando un $Valor P = 4.09\times10^{-8}$, podemos rechazar la hipótesis nula con un nivel de significancia de $\alpha = 0.05$ lo que nos permite concluir que $X$ no cumple normalidad multivariada. Basado en el **Teorema del limite central** sabemos que si se tiene:
 
 $\overline{\mathbf{X}}_n=\frac{1}{n} \sum_{i=1}^n \mathbf{X}_i$ y $\mathbf{Z}_n=\sqrt{n}\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right)$
 
-Luego: 
+Luego:
 
 $$
 \mathbf{Z}_n \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{\Sigma}) .
 $$
 
-con $\Sigma > 0$: 
-$$
+con $\Sigma > 0$: $$
 \tilde{\mathbf{Z}}_n=\boldsymbol{\Sigma}^{-\frac{1}{2}} \sqrt{n}\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right) \stackrel{d}{\rightarrow} N_p\left(\mathbf{0}, I_p\right)
 $$
 
@@ -99,8 +96,7 @@ y
 
 $$
 n\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right)^{\prime} S^{-1}\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right) \stackrel{d}{\rightarrow} \chi^2(p)
-$$
-Bajo $H_0$ cierta. El estadístico de prueba es: 
+$$ Bajo $H_0$ cierta. El estadístico de prueba es:
 
 $$
 \chi_0^2=n\left(\bar{X}-\mu_0\right)^{\prime} S^{-1}\left(\bar{X}-\mu_0\right)
@@ -108,8 +104,7 @@ $$
 
 Se define las siguientes pruebas de hipótesis:
 
-$$H_0: \mu = \mu_0\ vs\  H_a: \mu \ne \mu_0$$
-Se procede a hallar el vector de medias muestral $\bar{X}$ y la matriz de covarianzas muestral S en R.
+$$H_0: \mu = \mu_0\ vs\  H_a: \mu \ne \mu_0$$ Se procede a hallar el vector de medias muestral $\bar{X}$ y la matriz de covarianzas muestral S en R.
 
 ```{r, echo = T}
 xbar <- colMeans(x)
@@ -121,14 +116,100 @@ chi_0 <- as.numeric(n*(t(xbar-mu_0)) %*%solve(s) %*%(xbar-mu_0))
 chi_0
 ```
 
-Se plantea una región de rechazo de $H_0$ dada por:
-$$ X_0^{2} > X_\alpha^{2}(p)$$
+Se plantea una región de rechazo de $H_0$ dada por: $$ X_0^{2} > X_\alpha^{2}(p)$$
 
 ```{r}
 qchisq(0.05, p, lower.tail = F)
 ```
 
-Dado que la prueba nos arroja $X_0^{2} = 1603.695 > X_{0.05}^{2}(8) = 15.50731$ con un nivel de significancia de $\alpha = 0.05$. Se rechaza $H_0$, lo que nos permite concluir que existen diferencia entre el vector $\mu$ y $\mu_0$. 
+Dado que la prueba nos arroja $X_0^{2} = 1603.695 > X_{0.05}^{2}(8) = 15.50731$ con un nivel de significancia de $\alpha = 0.05$. Se rechaza $H_0$, lo que nos permite concluir que existen diferencia entre el vector $\mu$ y $\mu_0$.
 
+![](Images/Q2.jpeg)
 
+\subsection{Análisis discriminado sexo Masculino:}
 
+Se procede a filtra los datos por el genero masculino.
+
+```{r}
+hom <- datos %>% filter(SEXO == "Hom") %>% select(P1, P7, P16, P22, P25, P27, P29, P38)
+```
+
+Se plantea sus hipótesis de normalidad multivariada discriminando por el genero de hombres.
+
+$$
+H_o: X_H \sim N_p(\mu, \Sigma)\ VS\ H_a: X_H \nsim N_p(\mu, \Sigma)
+$$
+
+```{r}
+mshapiro.test(t(as.matrix(hom)))
+```
+
+Observando un $Valor P = 1.91\times10^{-6}$, podemos rechazar la hipótesis nula con un nivel de significancia de $\alpha = 0.05$ lo que nos permite concluir que el vector de variables $X$ para los hombres no se distribuye normal, por tanto basado en el teorema del limite central tenemos que el estadístico de prueba es:
+
+$$
+\chi_0^2=n\left(\bar{X}_{h o m}-\mu_0\right)^{\prime} S_{h o m}^{-1}\left(\bar{X}_{h o m}-\mu_0\right) \stackrel{d}{\longrightarrow} \chi_\alpha^2(\boldsymbol{P})
+$$ Con sus respectivas hipotesis:
+
+$$H_0: \mu_{homb} = \mu_0 \ vs \ H_a: \mu_{homb} \ne \mu_o$$
+
+```{r}
+xbar <- colMeans(hom)
+s <- cov(hom)
+n <- nrow(hom)
+p <- length(hom)
+mu_0<- as.matrix(c(mu_0))
+chi_0 <- as.numeric(n*(t(xbar-mu_0)) %*%solve(s) %*%(xbar-mu_0))
+chi_0
+```
+
+Se plantea una región de rechazo de $H_0$ dada por: $$ X_0^{2} > X_\alpha^{2}(p)$$
+
+```{r}
+qchisq(0.05, p, lower.tail = F)
+```
+
+Dado que la prueba nos arroja $X_0^{2} = 1403.088 > X_{0.05}^{2}(8) = 15.50731$ con un nivel de significancia de $\alpha = 0.05$. Se rechaza $H_0$, lo que nos permite concluir que existen diferencia entre el vector $\mu_{homb}$ y $\mu_0$.
+
+\subsection{Análisis discriminado sexo Femenino:}
+
+Se procede a filtra los datos por el genero masculino.
+
+```{r}
+muj <- datos %>% filter(SEXO == "Muj") %>% select(P1, P7, P16, P22, P25, P27, P29, P38)
+```
+
+Se plantea sus hipótesis de normalidad multivariada discriminando por el genero de mujeres.
+
+$$
+H_o: X_M \sim N_p(\mu, \Sigma)\ VS\ H_a: X_M \nsim N_p(\mu, \Sigma)
+$$
+
+```{r}
+mshapiro.test(t(as.matrix(muj)))
+```
+
+Observando un $Valor P = 0.001285$, podemos rechazar la hipótesis nula con un nivel de significancia de $\alpha = 0.05$ lo que nos permite concluir que el vector de variables $X$ para las mujeres no se distribuye normal, por tanto basado en el teorema del limite central tenemos que el estadístico de prueba es:
+
+$$
+\chi_0^2=n\left(\bar{X}_{muj}-\mu_0\right)^{\prime} S_{muj}^{-1}\left(\bar{X}_{h o m}-\mu_0\right) \stackrel{d}{\longrightarrow} \chi_\alpha^2(\boldsymbol{P})
+$$ Con sus respectivas hipotesis:
+
+$$H_0: \mu_{muj} = \mu_0 \ vs \ H_a: \mu_{muj} \ne \mu_o$$
+
+```{r}
+xbar <- colMeans(muj)
+s <- cov(muj)
+n <- nrow(muj)
+p <- length(muj)
+mu_0<- as.matrix(c(mu_0))
+chi_0 <- as.numeric(n*(t(xbar-mu_0))%*%solve(s)%*%(xbar-mu_0))
+chi_0
+```
+
+Se plantea una región de rechazo de $H_0$ dada por: $$ X_0^{2} > X_\alpha^{2}(p)$$
+
+```{r}
+qchisq(0.05, p, lower.tail = F)
+```
+
+Dado que la prueba nos arroja $X_0^{2} = 2773.412 > X_{0.05}^{2}(8) = 15.50731$ con un nivel de significancia de $\alpha = 0.05$. Se rechaza $H_0$, lo que nos permite concluir que existen diferencia entre el vector $\mu_{muj}$ y $\mu_0$.
