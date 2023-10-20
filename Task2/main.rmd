@@ -25,6 +25,7 @@ knitr::opts_chunk$set(warning = FALSE,
 ```{r}
 library(tidyverse)
 library(knitr)
+library(mvnormtest)
 ```
 
 ```{=tex}
@@ -43,3 +44,91 @@ library(knitr)
 \textbf{Trabajo 2}
 \end{center}
 ```
+\section{Parte A}
+
+\section{Parte B}
+
+Para todos los efectos el vector $X = (P_1, P_7, P_{16}, P_{22}, P_{25}, P_{27}, P_{29}, P_{38})$ contiene las variables continuas de su base de datos. Por notación sea el respectivo $\mu = (\mu_1, \mu_2, \mu_3, \mu_4, \mu_5, \mu_6, \mu_7, \mu_8)$ vector de medias y $\Sigma$ su matriz de covarianzas.
+
+Se procede a tomar la muestra aleatoria con la cedula **1020479466** y a seleccionar las variables numéricas.
+
+```{r, echo = TRUE}
+library(splitstackshape)
+uno <- read.table("Data/base.txt", header = TRUE)
+genera <- function(cedula){
+set.seed(cedula)
+aux <- stratified(uno, "CAT_IMC", 200/2100)
+aux
+} 
+
+datos <- genera(1020479466)
+x <- datos %>% select(P1, P7, P16, P22, P25, P27, P29, P38)
+```
+
+<!---Punto 1 --->
+
+![](Images/Q1.jpeg)
+
+Primero procederemos a verificar si el vector de variables se distribuye normal por medio de la prueba estadística Shapiro-Wilk de normalidad multivariada. 
+
+```{r}
+
+library(mvnormtest)
+mu_0 <- c(66.1, 58, 81.6, 37, 47, 25, 19.2, 167)
+mshapiro.test(t(as.matrix(x)))
+```
+
+Observando un $Valor P = 4.09\times10^{-8}$, podemos rechazar la hipótesis nula con un nivel de 
+significancia de $\alpha = 0.05$ lo que nos permite concluir que $X$ no cumple normalidad multivariada.
+Basado en el **Teorema del limite central** sabemos que si se tiene: 
+
+$\overline{\mathbf{X}}_n=\frac{1}{n} \sum_{i=1}^n \mathbf{X}_i$ y $\mathbf{Z}_n=\sqrt{n}\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right)$
+
+Luego: 
+
+$$
+\mathbf{Z}_n \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{\Sigma}) .
+$$
+
+con $\Sigma > 0$: 
+$$
+\tilde{\mathbf{Z}}_n=\boldsymbol{\Sigma}^{-\frac{1}{2}} \sqrt{n}\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right) \stackrel{d}{\rightarrow} N_p\left(\mathbf{0}, I_p\right)
+$$
+
+y
+
+$$
+n\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right)^{\prime} S^{-1}\left(\overline{\mathbf{X}}_n-\boldsymbol{\mu}\right) \stackrel{d}{\rightarrow} \chi^2(p)
+$$
+Bajo $H_0$ cierta. El estadístico de prueba es: 
+
+$$
+\chi_0^2=n\left(\bar{X}-\mu_0\right)^{\prime} S^{-1}\left(\bar{X}-\mu_0\right)
+$$
+
+Se define las siguientes pruebas de hipótesis:
+
+$$H_0: \mu = \mu_0\ vs\  H_a: \mu \ne \mu_0$$
+Se procede a hallar el vector de medias muestral $\bar{X}$ y la matriz de covarianzas muestral S en R.
+
+```{r, echo = T}
+xbar <- colMeans(x)
+s <- cov(x)
+n <- nrow(x)
+p <- length(x)
+mu_0<- as.matrix(c(mu_0))
+chi_0 <- as.numeric(n*(t(xbar-mu_0)) %*%solve(s) %*%(xbar-mu_0))
+chi_0
+```
+
+Se plantea una región de rechazo de $H_0$ dada por:
+$$ X_0^{2} > X_\alpha^{2}(p)$$
+
+```{r}
+qchisq(0.05, p, lower.tail = F)
+```
+
+Dado que la prueba nos arroja $X_0^{2} = 1603.695 > X_{0.05}^{2}(8) = 15.50731$ con un nivel de significancia de $\alpha = 0.05$. Se rechaza $H_0$, lo que nos permite concluir que existen diferencia entre el vector $\mu$ y $\mu_0$. 
+
+
+
