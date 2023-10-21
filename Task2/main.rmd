@@ -104,8 +104,7 @@ $$
 
 Se define las siguientes pruebas de hipótesis:
 
-$$H_0: \mu = \mu_0\ vs\  H_a: \mu \ne \mu_0$$ 
-Se procede a hallar el vector de medias muestral $\bar{X}$ y la matriz de covarianzas muestral S en R.
+$$H_0: \mu = \mu_0\ vs\  H_a: \mu \ne \mu_0$$ Se procede a hallar el vector de medias muestral $\bar{X}$ y la matriz de covarianzas muestral S en R.
 
 ```{r, echo = T}
 xbar <- colMeans(x)
@@ -117,14 +116,15 @@ chi_0 <- as.numeric(n*(t(xbar-mu_0)) %*%solve(s) %*%(xbar-mu_0))
 chi_0
 ```
 
-Se plantea una región de rechazo de $H_0$ dada por: 
-$$ X_0^{2} > X_\alpha^{2}(p)$$
+Se plantea una región de rechazo de $H_0$ dada por: $$ X_0^{2} > X_\alpha^{2}(p)$$
 
 ```{r}
 qchisq(0.05, p, lower.tail = F)
 ```
 
 Dado que la prueba nos arroja $X_0^{2} = 1603.695 > X_{0.05}^{2}(8) = 15.50731$ con un nivel de significancia de $\alpha = 0.05$. Se rechaza $H_0$, lo que nos permite concluir que existen diferencia entre el vector $\mu$ y $\mu_0$.
+
+<!---Punto 2 --->
 
 ![](Images/Q2.jpeg)
 
@@ -150,8 +150,7 @@ Observando un $Valor P = 1.91\times10^{-6}$, podemos rechazar la hipótesis nula
 
 $$
 \chi_0^2=n\left(\bar{X}_{h o m}-\mu_0\right)^{\prime} S_{h o m}^{-1}\left(\bar{X}_{h o m}-\mu_0\right) \stackrel{d}{\longrightarrow} \chi_\alpha^2(\boldsymbol{P})
-$$ 
-Con sus respectivas hipotesis:
+$$ Con sus respectivas hipotesis:
 
 $$H_0: \mu_{homb} = \mu_0 \ vs \ H_a: \mu_{homb} \ne \mu_o$$
 
@@ -217,6 +216,8 @@ qchisq(0.05, p, lower.tail = F)
 
 Dado que la prueba nos arroja $X_0^{2} = 2773.412 > X_{0.05}^{2}(8) = 15.50731$ con un nivel de significancia de $\alpha = 0.05$. Se rechaza $H_0$, lo que nos permite concluir que existen diferencia entre el vector $\mu_{muj}$ y $\mu_0$.
 
+<!--- Punto3 --->
+
 ![](Images/Q3.jpeg)
 
 Primero se procede a plantear las hipótesis para los contrastes, como:
@@ -244,9 +245,7 @@ Estadístico de prueba:
 
 $$
 T_0^2=n(C \overline{\mathbf{X}}-\gamma)^{\prime}\left(C S C^{\prime}\right)^{-1}(C \overline{\mathbf{X}}-\gamma)
-$$
-Bajo $H_0$ cierto. Se rechaza si $\frac{n-k}{(n-1) k} T_0^2>f_\alpha(k, n-k)$
-
+$$ Bajo $H_0$ cierto. Se rechaza si $\frac{n-k}{(n-1) k} T_0^2>f_\alpha(k, n-k)$
 
 ```{r, include = F, eval = F}
 mu <- colMeans(x)
@@ -259,4 +258,84 @@ fcal <- (n-2)/(2*(n-1))*as.numeric(T_0)
 f_alpha <- qf(0.05,2,199-2,lower.tail = F)
 ```
 
-Luego tenemos un $\frac{199-2}{2(199-1)}T_0^2 = 50.57493 > f_{0.05}(2, 197) = 3.041753$ y con una significancia de $\alpha = 0.05$ lo que nos permite rechazar $H_0$ concluyendo que $2 \mu_1-\mu_2+3 \mu_4+\mu_7-\mu_6\neq\mu_8 \quad y \quad 3 \mu_2-4 \mu_3+2 \mu_5+2 \mu_6\neq0$ 
+Luego tenemos un $\frac{199-2}{2(199-1)}T_0^2 = 50.57493 > f_{0.05}(2, 197) = 3.041753$ y con una significancia de $\alpha = 0.05$ lo que nos permite rechazar $H_0$ concluyendo que $2 \mu_1-\mu_2+3 \mu_4+\mu_7-\mu_6\neq\mu_8 \quad y \quad 3 \mu_2-4 \mu_3+2 \mu_5+2 \mu_6\neq0$
+
+<!---Punto 4 --->
+
+![](Images/Q4.jpeg)
+
+<!---Punto 5 --->
+
+![](Images/Q5.jpeg) El estadístico de razón de verosimilitud que nos permite probar $H_0$ se define como:
+
+$$
+\lambda=\prod_{i=1}^g\left(\frac{\left|S_i\right|}{\left|S_p\right|}\right)^{\frac{\left(n_i-1\right)}{2}}
+$$
+
+Donde $S_i$ son la matrices de covarianzas muéstrales para el genero masculino y el genero femenino. Y $\left.S_p=\frac{1}{\sum_{i=1}^g\left(n_i-1\right)}\left[\left(n_1-1\right) S_1+n_2-1\right) S_2+\cdots+\left(n_g-1\right) S_g\right]$
+
+$$M = -2ln\lambda$$ $$
+M = \left[\sum_{i=1}^g\left(n_i-1\right)\right] \ln (\mid S_p \mid ) -\sum_{i=1}^g\left(n_i-1\right) \ln \left(\left|S_i\right|\right)
+$$
+
+$$
+u = \left[\sum_{i=1}^g \frac{1}{\left(n_i-1\right)}-\frac{1 }{\sum_{i=1}^g\left(n_i-1\right)}\right]\left(\frac{2 p^2+3 p-1}{6(p+1)(g+1)}\right)
+$$
+
+Bajo $H_0$ verdadero se cumple:
+
+$$
+C=(1-u) M \stackrel{d}{\rightarrow} \chi^2\left(\frac{1}{2} p(p+1)(g-1)\right)
+$$ Con un $\alpha = 0.05$ se rechaza $H_0$ si $C>\chi_{0.05}^2\left(\frac{1}{2} p(p+1)(g-1)\right)$
+
+Su respectiva hipótesis: $$H_0: \Sigma_{hom}= \Sigma_{muj} \ vs \ H_a:\Sigma_{hom} \neq \Sigma_{muj}$$
+
+```{r}
+nh <- nrow(hom)
+nm <- nrow(muj)
+varh<- cov(hom)
+varm<- cov(muj)
+sum_n <- (nh-1)*varh+(nm-1)*varm
+sum_d <- (nh-1)+(nm-1)
+sp <- sum_n/sum_d
+#Estadistico de prueba
+p <- 8
+M <- sum_d*log(det(sp))-((nh-1)*log(det(varh))+(nm-1)*log(det(varm)))
+sum_inv_ni <- (1/(nm-1))+(1/(nh-1))
+k <- ((2*(p^2)+3*p-1)/(6*(p+1)*(2+1)))
+u <- (sum_inv_ni-(1/sum_d))*k
+C <- (1-u)*M
+
+gl <- (p*(p+1)*(2-1))/2
+alpha <- 0.05
+q_alpha <- qchisq(0.05,gl,lower.tail = T)
+```
+
+Luego tenemos un $C = 88.22488 > \chi_{0.05}^{2} = 23.26861$ y con una significancia de $\alpha = 0.05$ lo que nos permite rechazar $H_0$ concluyendo que $\Sigma_{hom} \neq \Sigma_{muj}$.
+
+<!---Punto 6 --->
+
+![](Images/Q6.jpeg)
+
+```{r}
+var_m <- cov(x) %>% as.matrix()
+eigen_vec <- eigen(var_m)
+```
+
+## Vectores Propios
+```{r}
+eigen_vec$vectors
+```
+
+## Valores Propios
+```{r}
+eigen_values <- eigen_vec$values
+eigen_values
+```
+
+## Componentes Principales
+```{r}
+pca <- prcomp(var_m)
+summary(pca)
+```
+
