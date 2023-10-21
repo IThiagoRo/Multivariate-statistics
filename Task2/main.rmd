@@ -26,24 +26,16 @@ knitr::opts_chunk$set(warning = FALSE,
 library(tidyverse)
 library(knitr)
 library(mvnormtest)
+library(factoextra)
 ```
 
 ```{=tex}
 \pagestyle{myheadings}
 \input{DocumentFormat/titlepage}
-\thispagestyle{empty}
-\tableofcontents
-\listoffigures
-\listoftables
-\newpage
 ```
 \setcounter{page}{2}
 
-```{=tex}
-\begin{center}
-\textbf{Trabajo 2}
-\end{center}
-```
+
 \section{Parte A}
 
 \section{Parte B}
@@ -264,54 +256,57 @@ Luego tenemos un $\frac{199-2}{2(199-1)}T_0^2 = 50.57493 > f_{0.05}(2, 197) = 3.
 
 ![](Images/Q4.jpeg)
 
-<!---Punto 5 --->
+Se plantean las respectivas Hipótesis como: 
+$$H_o:\Sigma_{obeso} = \Sigma_{normal} = \Sigma_{delgado} \ vs \ H_a:\Sigma_{obeso} \neq \Sigma_{normal} \neq \Sigma_{delgado} $$
 
-![](Images/Q5.jpeg) El estadístico de razón de verosimilitud que nos permite probar $H_0$ se define como:
-
-$$
-\lambda=\prod_{i=1}^g\left(\frac{\left|S_i\right|}{\left|S_p\right|}\right)^{\frac{\left(n_i-1\right)}{2}}
-$$
-
-Donde $S_i$ son la matrices de covarianzas muéstrales para el genero masculino y el genero femenino. Y $\left.S_p=\frac{1}{\sum_{i=1}^g\left(n_i-1\right)}\left[\left(n_1-1\right) S_1+n_2-1\right) S_2+\cdots+\left(n_g-1\right) S_g\right]$
-
-$$M = -2ln\lambda$$ $$
-M = \left[\sum_{i=1}^g\left(n_i-1\right)\right] \ln (\mid S_p \mid ) -\sum_{i=1}^g\left(n_i-1\right) \ln \left(\left|S_i\right|\right)
-$$
-
-$$
-u = \left[\sum_{i=1}^g \frac{1}{\left(n_i-1\right)}-\frac{1 }{\sum_{i=1}^g\left(n_i-1\right)}\right]\left(\frac{2 p^2+3 p-1}{6(p+1)(g+1)}\right)
-$$
-
-Bajo $H_0$ verdadero se cumple:
-
-$$
-C=(1-u) M \stackrel{d}{\rightarrow} \chi^2\left(\frac{1}{2} p(p+1)(g-1)\right)
-$$ Con un $\alpha = 0.05$ se rechaza $H_0$ si $C>\chi_{0.05}^2\left(\frac{1}{2} p(p+1)(g-1)\right)$
-
-Su respectiva hipótesis: $$H_0: \Sigma_{hom}= \Sigma_{muj} \ vs \ H_a:\Sigma_{hom} \neq \Sigma_{muj}$$
 
 ```{r}
-nh <- nrow(hom)
-nm <- nrow(muj)
-varh<- cov(hom)
-varm<- cov(muj)
-sum_n <- (nh-1)*varh+(nm-1)*varm
-sum_d <- (nh-1)+(nm-1)
-sp <- sum_n/sum_d
-#Estadistico de prueba
-p <- 8
-M <- sum_d*log(det(sp))-((nh-1)*log(det(varh))+(nm-1)*log(det(varm)))
-sum_inv_ni <- (1/(nm-1))+(1/(nh-1))
-k <- ((2*(p^2)+3*p-1)/(6*(p+1)*(2+1)))
-u <- (sum_inv_ni-(1/sum_d))*k
+delg <- datos %>% filter(CAT_IMC == 'Delgado')
+norm <- datos %>% filter(CAT_IMC == 'Normal')
+obes <- datos %>% filter(CAT_IMC == 'Obeso')
+
+delg <- delg[, 2:9]
+norm <- norm[, 2:9]
+obes <- obes[, 2:9]
+
+n1 <- nrow(delg)
+n2 <- nrow(norm)
+n3 <- nrow(obes)
+p <- ncol(delg)
+g <- 3
+
+# Varianzas muestrales 
+s1 <- matrix(var(delg), ncol=8)
+s2 <- matrix(var(norm), ncol=8)
+s3 <- matrix(var(obes), ncol=8)
+
+# Matriz ponderada
+sum_ni <- ((n1-1)+(n2-1)+(n3-1))
+sum_inv_ni <- (1/(n1-1))+(1/(n2-1))+(1/(n3-1))
+k <- (2*p^2 +3*p-1)/(6*(p+1)*(g+1))
+
+sp <- ((n1-1)*s1+(n2-1)*s2+(n3-1)*s3)/sum_ni
+
+# Estadístico M 
+M <- sum_ni*log(det(sp))-((n1-1)*log(det(s1))+(n2-1)*log(det(s2))+(n3-1)*log(det(s3)))
+u <- (sum_inv_ni -(1/sum_ni))*k
 C <- (1-u)*M
 
-gl <- (p*(p+1)*(2-1))/2
+#Chi^2
 alpha <- 0.05
-q_alpha <- qchisq(0.05,gl,lower.tail = T)
+gl <- p*(p+1)*(g-1)/2
+q <- qchisq(alpha,gl)
 ```
 
-Luego tenemos un $C = 88.22488 > \chi_{0.05}^{2} = 23.26861$ y con una significancia de $\alpha = 0.05$ lo que nos permite rechazar $H_0$ concluyendo que $\Sigma_{hom} \neq \Sigma_{muj}$.
+
+Se obtine un $C = 121.4472 > \chi_{0.05}^{2} = 53.46233$ con una significancia de $\alpha = 0.05$ nos permite rechazar $H_0$ y concluir que la estructura de covarianza es diferente para los tres grupos $\Sigma_{obeso} \neq \Sigma_{normal} \neq \Sigma_{delgado}$. 
+
+
+<!---Punto 5 --->
+
+![](Images/Q5.jpeg) 
+
+
 
 <!---Punto 6 --->
 
@@ -322,20 +317,42 @@ var_m <- cov(x) %>% as.matrix()
 eigen_vec <- eigen(var_m)
 ```
 
-## Vectores Propios
+
+```{=tex}
+\begin{center}
+\textbf{Vectores Propios}
+\end{center}
+```
+
+ 
 ```{r}
 eigen_vec$vectors
 ```
+```{=tex}
+\begin{center}
+\textbf{Valores Propios}
+\end{center}
+```
 
-## Valores Propios
+
 ```{r}
 eigen_values <- eigen_vec$values
 eigen_values
 ```
 
-## Componentes Principales
+```{=tex}
+\begin{center}
+\textbf{Componentes Principales}
+\end{center}
+```
+
+
 ```{r}
 pca <- prcomp(var_m)
 summary(pca)
+```
+
+```{r}
+fviz_eig(pca, addlabels = TRUE, ylim = c(0, 93), main="Figure 1")
 ```
 
