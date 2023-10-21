@@ -306,6 +306,41 @@ Se obtine un $C = 121.4472 > \chi_{0.05}^{2} = 53.46233$ con una significancia d
 
 ![](Images/Q5.jpeg) 
 
+Como el vector x no se distribuye normal multivariado, entonces un estimador insesgado para $\mu_h - \mu_m$ es: $\bar{X} - \bar{Y}$. Si $n-p$ y $m-p$ son grandes el TLC nos garantiza que: 
+
+$\Sigma_H \sqrt{n}(\bar{X} - \mu_H) \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{I_p})$ y $\Sigma_M \sqrt{n}(\bar{Y} - \mu_M) \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{I_p})$
+
+Por Slutsky tenemos: 
+
+$$S^{-\frac{1}{2}}[(\bar{X_n}-\bar{Y_m}) - (\mu_H -\mu_M)] \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{I_p})$$
+Bajo $H_0$ cierta se tiene que:
+
+$$X_C = [(\bar{X_n}-\bar{Y_m})-\delta_0][\frac{1}{n}S_1 + \frac{1}{m}S_2]^{-1}[(\bar{X_n}-\bar{Y_m})-\delta_0]\stackrel{d}{\rightarrow} \chi_{\alpha}^2(p)$$
+
+
+Se rechaza $H_0$ si $X_c > \chi_{\alpha}{2}(p)$
+
+Las respectivas hipotesis son:
+$$H_0: \mu_h = \mu_m \ vs \ H_a: \mu_h \neq \mu_m $$
+Que es equivalente a probar:
+$$H_0: \mu_h - \mu_m = \delta_0 \ vs \ H_a: \mu_h - \mu_m \neq \delta_0 $$
+con $\delta_0 = (0, 0, 0, 0, 0, 0, 0, 0)$
+
+```{r}
+muh <- colMeans(muj)
+mum <- colMeans(hom)
+varh <- cov(hom)
+varm <- cov(muj)
+nh <- nrow(hom)
+nm <- nrow(muj)
+r_0 <- cbind(c(0,0,0,0,0,0,0,0))
+dif <- muh-mum
+S <- (1/nm)*varm+(1/nh)*varh
+Xc <- as.numeric(t(dif-r_0)%*%solve(S)%*%(dif-r_0))
+f_alpha <- qchisq(0.05,8,lower.tail = F)
+```
+
+Se obtine un $X_C = 1050.692 > \chi_{0.05}^{2}(8) = 16.91898$ con una significancia de $\alpha = 0.05$ nos permite rechazar $H_0$ y concluir que el vector $X$ no son suficiente para poder discriminar entre Hombres y Mujeres.
 
 
 <!---Punto 6 --->
