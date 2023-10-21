@@ -35,7 +35,6 @@ library(factoextra)
 ```
 \setcounter{page}{2}
 
-
 \section{Parte A}
 
 \section{Parte B}
@@ -256,9 +255,7 @@ Luego tenemos un $\frac{199-2}{2(199-1)}T_0^2 = 50.57493 > f_{0.05}(2, 197) = 3.
 
 ![](Images/Q4.jpeg)
 
-Se plantean las respectivas Hipótesis como: 
-$$H_o:\Sigma_{obeso} = \Sigma_{normal} = \Sigma_{delgado} \ vs \ H_a:\Sigma_{obeso} \neq \Sigma_{normal} \neq \Sigma_{delgado} $$
-
+Se plantean las respectivas Hipótesis como: $$H_o:\Sigma_{obeso} = \Sigma_{normal} = \Sigma_{delgado} \ vs \ H_a:\Sigma_{obeso} \neq \Sigma_{normal} \neq \Sigma_{delgado} $$
 
 ```{r}
 delg <- datos %>% filter(CAT_IMC == 'Delgado')
@@ -298,33 +295,25 @@ gl <- p*(p+1)*(g-1)/2
 q <- qchisq(alpha,gl)
 ```
 
-
-Se obtine un $C = 121.4472 > \chi_{0.05}^{2} = 53.46233$ con una significancia de $\alpha = 0.05$ nos permite rechazar $H_0$ y concluir que la estructura de covarianza es diferente para los tres grupos $\Sigma_{obeso} \neq \Sigma_{normal} \neq \Sigma_{delgado}$. 
-
+Se obtine un $C = 121.4472 > \chi_{0.05}^{2} = 53.46233$ con una significancia de $\alpha = 0.05$ nos permite rechazar $H_0$ y concluir que la estructura de covarianza es diferente para los tres grupos $\Sigma_{obeso} \neq \Sigma_{normal} \neq \Sigma_{delgado}$.
 
 <!---Punto 5 --->
 
-![](Images/Q5.jpeg) 
+![](Images/Q5.jpeg)
 
-Como el vector x no se distribuye normal multivariado, entonces un estimador insesgado para $\mu_h - \mu_m$ es: $\bar{X} - \bar{Y}$. Si $n-p$ y $m-p$ son grandes el TLC nos garantiza que: 
+Como el vector $X$ no se distribuye normal multivariado, entonces un estimador insesgado para $\mu_h - \mu_m$ es: $\bar{X} - \bar{Y}$. Si $n-p$ y $m-p$ son grandes el TLC nos garantiza que:
 
 $\Sigma_H \sqrt{n}(\bar{X} - \mu_H) \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{I_p})$ y $\Sigma_M \sqrt{n}(\bar{Y} - \mu_M) \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{I_p})$
 
-Por Slutsky tenemos: 
+Por Slutsky tenemos:
 
-$$S^{-\frac{1}{2}}[(\bar{X_n}-\bar{Y_m}) - (\mu_H -\mu_M)] \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{I_p})$$
-Bajo $H_0$ cierta se tiene que:
+$$S^{-\frac{1}{2}}[(\bar{X_n}-\bar{Y_m}) - (\mu_H -\mu_M)] \stackrel{d}{\rightarrow} N_p(\mathbf{0}, \boldsymbol{I_p})$$ Bajo $H_0$ cierta se tiene que:
 
 $$X_C = [(\bar{X_n}-\bar{Y_m})-\delta_0][\frac{1}{n}S_1 + \frac{1}{m}S_2]^{-1}[(\bar{X_n}-\bar{Y_m})-\delta_0]\stackrel{d}{\rightarrow} \chi_{\alpha}^2(p)$$
 
-
 Se rechaza $H_0$ si $X_c > \chi_{\alpha}{2}(p)$
 
-Las respectivas hipotesis son:
-$$H_0: \mu_h = \mu_m \ vs \ H_a: \mu_h \neq \mu_m $$
-Que es equivalente a probar:
-$$H_0: \mu_h - \mu_m = \delta_0 \ vs \ H_a: \mu_h - \mu_m \neq \delta_0 $$
-con $\delta_0 = (0, 0, 0, 0, 0, 0, 0, 0)$
+Las respectivas hipotesis son: $$H_0: \mu_h = \mu_m \ vs \ H_a: \mu_h \neq \mu_m $$ Que es equivalente a probar: $$H_0: \mu_h - \mu_m = \delta_0 \ vs \ H_a: \mu_h - \mu_m \neq \delta_0 $$ con $\delta_0 = (0, 0, 0, 0, 0, 0, 0, 0)$
 
 ```{r}
 muh <- colMeans(muj)
@@ -340,8 +329,7 @@ Xc <- as.numeric(t(dif-r_0)%*%solve(S)%*%(dif-r_0))
 f_alpha <- qchisq(0.05,8,lower.tail = F)
 ```
 
-Se obtine un $X_C = 1050.692 > \chi_{0.05}^{2}(8) = 16.91898$ con una significancia de $\alpha = 0.05$ nos permite rechazar $H_0$ y concluir que el vector $X$ no son suficiente para poder discriminar entre Hombres y Mujeres.
-
+Se obtine un $X_C = 1050.692 > \chi_{0.05}^{2}(8) = 16.91898$ con una significancia de $\alpha = 0.05$ nos permite rechazar $H_0$ y concluir que el vector $X$ no es suficiente para poder discriminar entre Hombres y Mujeres.
 
 <!---Punto 6 --->
 
@@ -352,23 +340,30 @@ var_m <- cov(x) %>% as.matrix()
 eigen_vec <- eigen(var_m)
 ```
 
-
 ```{=tex}
 \begin{center}
 \textbf{Vectores Propios}
 \end{center}
 ```
-
- 
 ```{r}
 eigen_vec$vectors
 ```
+
+Los vectores propios indican la influencia de cada variable en la componente. Las variables con un valor absoluto más alto en el vector propio tienen una mayor influencia en la componente principal. En nuestro caso, las variables con mayor influencia son: 
+
+P1(masa), P7(Perímetro del muslo), P16(Perímetro abdominal cintura), P38 (Altura).
+
+
 ```{=tex}
 \begin{center}
 \textbf{Valores Propios}
 \end{center}
 ```
+Como tenemos 8 variables de interés nuestra matriz de covarianza es de $8x8$ por lo tanto tendremos 9 valores propios los cuales son:
 
+$$\hat{\lambda_1} = 271.1646218; \hat{\lambda_12} = 61.6813232; \hat{\lambda_3} = 22.3281270; \hat{\lambda_4} = 4.1034057; \hat{\lambda_5} = 2.8346277; \hat{\lambda_6} = 2.3134986;$$
+
+$$\hat{\lambda_7} = 0.6964915; \hat{\lambda_8} = 0.1826296;$$
 
 ```{r}
 eigen_values <- eigen_vec$values
@@ -380,8 +375,6 @@ eigen_values
 \textbf{Componentes Principales}
 \end{center}
 ```
-
-
 ```{r}
 pca <- prcomp(var_m)
 summary(pca)
@@ -390,4 +383,8 @@ summary(pca)
 ```{r}
 fviz_eig(pca, addlabels = TRUE, ylim = c(0, 93), main="Figure 1")
 ```
+
+Como se puede observar en el gráfico anterior y en el resumen numérico de las componentes principales, la primera componente principal explica el 88.6%, y la segunda componente explica el 10.2% de la variabilidad total. En conjunto, las dos primeras componentes principales explican el 98.8% de la variabilidad total. La primera componente principal se relaciona con las variables **P1(masa)**, **P7(Perímetro del muslo)**, **P16(Perímetro abdominal cintura)** **P38 (Altura)**,
+
+
 
