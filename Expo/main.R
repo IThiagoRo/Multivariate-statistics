@@ -30,6 +30,103 @@ sick <- db %>% filter(., HeartDisease == 1)
 no_sick <- db %>% filter(., HeartDisease == 0)
 
 
+query <- db %>% select(HeartDisease) %>% table %>% as.data.frame()
+ggplot(query, aes(x=HeartDisease, y=Freq)) + 
+  geom_bar(stat = "identity")+
+  geom_text(aes(label = Freq), vjust = -0.5, size = 3)+
+  labs(title = "Diagrama de Barras - Insuficiencia cardiaca ", y="Numero de personas")+
+  ylim(0, 550) +
+  theme_bw()
+
+query <- query %>% mutate(Percent = Freq / sum(Freq) * 100)
+ggplot(query, aes(x = HeartDisease, y = round(Percent, 2))) + 
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = paste0(round(Percent, 2), "%")), vjust = -0.5, size = 3) +
+  labs(title = "Diagrama de Barras - Estudiantes Foraneos", y="Porcentaje de personas")+
+  ylim(0, 65) +
+  theme_bw()
+
+
+query <- db %>% select(HeartDisease, Sex) %>% group_by(HeartDisease, Sex) %>% count()
+ggplot(query, aes(x = Sex, y = n, fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=n),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - Insuficiencia cardiaca por genero", y="Numero de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  theme_bw()
+
+ggplot(query, aes(x = Sex, y = scales::percent(n/sum(n)), fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=scales::percent(n/sum(n))),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - Insuficiencia cardiaca por genero", y="Porcentaje de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  theme_bw()
+
+
+query <- db %>% select(HeartDisease, RestingECG) %>% group_by(HeartDisease, RestingECG) %>% count()
+ggplot(query, aes(x = RestingECG, y = n, fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=n),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - Resultado electrocardiograma en reposo", y="Numero de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  theme_bw()
+
+ggplot(query, aes(x = RestingECG, y = scales::percent(n/sum(n)), fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=scales::percent(n/sum(n))),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - Resultado electrocardiograma en reposo", y="Porcentaje de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  theme_bw()
+
+
+query <- db %>% select(HeartDisease, ChestPainType) %>% group_by(HeartDisease, ChestPainType) %>% count()
+names <- c("Asintomático", "Angina atípica", "Dolor no anginoso", "Angina típica")
+ggplot(query, aes(x = ChestPainType, y = n, fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=n),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - Tipo de dolor en el pecho", y="Numero de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  scale_x_discrete(labels=names) +
+  theme_bw()
+
+ggplot(query, aes(x = ChestPainType, y = scales::percent(n/sum(n)), fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=scales::percent(n/sum(n))),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - Tipo de dolor en el pecho", y="Porcentaje de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  scale_x_discrete(labels=names) +
+  theme_bw()
+
+
+
+query <- db %>% select(HeartDisease, FastingBS) %>% group_by(HeartDisease, FastingBS) %>% count()
+names <- c("<= 120 mg/dl", "> 120 mg/dl")
+ggplot(query, aes(x = FastingBS, y = n, fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=n),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - azúcar en la sangre en ayunas", y="Numero de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  scale_x_discrete(labels=names) +
+  theme_bw()
+
+ggplot(query, aes(x = FastingBS, y = scales::percent(n/sum(n)), fill=as.factor(HeartDisease))) +
+  geom_bar(stat = "identity", position = "dodge")+
+  geom_text(aes(label=scales::percent(n/sum(n))),position=position_dodge(0.90), vjust=-0.3, size=3)+
+  labs(title = "Diagrama de Barras - azúcar en la sangre en ayunas", y="Porcentaje de personas")+
+  scale_fill_brewer(name = "Insuficiencia cardiaca", 
+                    labels=c("No", "Si"))+
+  scale_x_discrete(labels=names) +
+  theme_bw()
+
+
+
 
 ggplot(db, aes(x = Age, y = MaxHR, color = HeartDisease)) +
   geom_point() +
@@ -93,7 +190,16 @@ table(test_data$HeartDisease, pred_valid, dnn=c("Real", "Predicha"))
 #Knn
 #pred_knn <- knn(train_data[, 1:11], test_data[, 1:11], cl=train_data$HeartDisease, k = 2, prob = TRUE)
 #table(test_data$HeartDisease, pred_knn)
+
+#The best K
+train.kknn(train_data$HeartDisease ~ ., train_data, kmax = 5)
+
+
 model_knn <- kknn(HeartDisease ~ ., train_data, test_data, k = 2)
 knn_pred <- fitted(model_knn)
 print(knn_pred)
 table(test_data$HeartDisease, knn_pred, dnn=c("Real", "Predicha"))
+
+matriz_conf_knn <- caret::confusionMatrix(data=knn_pred, reference = test_data$HeartDisease)
+
+
